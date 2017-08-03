@@ -1,0 +1,15 @@
+{
+  "name": "martingale-kubernetes-pack",
+  "version": "0.0.1",
+  "description": "Martingale Pack file for Kubernetes",
+  "repository": "git@github.com:pearsontechnology/martingale-kubernetes-pack.git",
+  "author": "Jeremy Darling <jeremy.darling@pearson.com>",
+  "scripts": {
+    "build": "mpack build",
+    "test": "mpack test"
+  },
+  "dependencies": {
+    "martingale-pack-builder": "^0.0.1"
+  },
+  "license": "MIT"
+}
