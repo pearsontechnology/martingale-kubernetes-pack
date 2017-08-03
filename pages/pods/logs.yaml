@@ -1,3 +1,4 @@
+description: Renders the logs of the passed in pod for the last 3600 seconds.
 paths:
   - /kube/:namespace/:pod/logs
   - /kube/:env/:namespace/:pod/logs

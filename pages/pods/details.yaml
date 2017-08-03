@@ -1,3 +1,4 @@
+description: Shows the details associated with a pod, similar to "kubectl get pod -o json"
 paths:
   - /kube/:namespace/:pod/details
   - /kube/:env/:namespace/:pod/details

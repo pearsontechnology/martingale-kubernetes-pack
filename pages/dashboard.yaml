@@ -1,3 +1,4 @@
+description: A basic dashboard showing the cluster status, latest events, and cluster nodes.
 templates:
   section: &TABLE_SECTION
     $type: Provider

@@ -1,3 +1,4 @@
+description: Shows a listing of the pods available within a namespace.
 paths:
   - /kube/:namespace/pods
   - /kube/:env/:namespace/pods

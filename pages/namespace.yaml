@@ -1,3 +1,4 @@
+description: Shows a listing of available namespaces within the cluster.
 $type: HeaderPage
 props:
   title: Namespaces
