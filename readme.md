@@ -1,5 +1,7 @@
 # Martinglae Kube Pack
 
+**Name:** Kube
+
 This pack provides screens that allow users to view and manage a Kubernetes cluster.
 
 **Required Endpoints:**
