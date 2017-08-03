@@ -1,0 +1,23 @@
+$type: HeaderPage
+props:
+  title:
+    $map: '`${params.namespace} - ${params.name}`'
+children:
+  $type: Panel
+  props:
+    inset: true
+  children:
+    $type: Provider
+    props:
+      provide:
+        json:
+          url:
+            $map: >-
+              (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.namespace}/resourcequotas/${params.name}`
+      Component:
+        $component: JsonView
+      props:
+        pretty: true
+paths:
+  - /kubernetes/namespace/:namespace/resourcequotas/:name
+  - /kubernetes/:env/namespace/:namespace/resourcequotas/:name

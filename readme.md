@@ -1,6 +1,6 @@
-# Martinglae Kube Pack
+# Martinglae Kubernetes Pack
 
-**Name:** Kube
+**Name:** Kubernetes
 
 This pack provides screens that allow users to view and manage a Kubernetes cluster.
 
@@ -12,7 +12,7 @@ Where :env is an optional value to route to different clusters.
 
 
 ## Included Pages
-### Dashboard: Side Nav
+### KubeDashboard: Side Nav
 
 <svg fill="currentColor" preserveAspectRatio="xMidYMid meet" height="64" width="64" viewBox="0 0 800 1500" style="vertical-align: middle;">
   <g>
@@ -22,54 +22,158 @@ Where :env is an optional value to route to different clusters.
 
   </g>
 </svg>
-A basic dashboard showing the cluster status, latest events, and cluster nodes.
 
-
-**Dynamic Path:** config.env?&#x60;/kube/${config.env}&#x60;:&#x27;/kube&#x27;
+**Dynamic Path:** config.env?&#x60;/kubernetes/${config.env}&#x60;:&#x27;/kube&#x27;
 
 **Path:** /kube
 
-**Path:** /kube/:env
+**Path:** /kubernetes/:env
 
 
 ### Namespaces: Side Nav
 
-Shows a listing of available namespaces within the cluster.
+**Icon:** Cluster
 
-**Icon:** Task
+**Dynamic Path:** config.env?&#x60;/kubernetes/${config.env}/namespaces&#x60;:&#x27;/kubernetes/namespaces&#x27;
 
-**Dynamic Path:** config.env?&#x60;/kube/${config.env}/namespaces&#x60;:&#x27;/kube/namespaces&#x27;
+**Path:** /kubernetes/namespaces
 
-**Path:** /kube/namespaces
-
-**Path:** /kube/:env/namespaces
-
-
-### Pods: 
-
-Shows a listing of the pods available within a namespace.
-
-**Path:** /kube/:namespace/pods
-
-**Path:** /kube/:env/:namespace/pods
+**Path:** /kubernetes/:env/namespaces
 
 
 ### Pod: 
 
-Shows the details associated with a pod, similar to &quot;kubectl get pod -o json&quot;
+**Path:** /kubernetes/namespace/:name/pod/:id
 
-**Path:** /kube/:namespace/:pod/details
-
-**Path:** /kube/:env/:namespace/:pod/details
+**Path:** /kubernetes/:env/namespace/:name/pod/:id
 
 
-### PodLogs: 
+### Logs: 
 
-Renders the logs of the passed in pod for the last 3600 seconds.
+**Path:** /kubernetes/namespace/:name/pod/:id/logs
 
-**Path:** /kube/:namespace/:pod/logs
+**Path:** /kubernetes/:env/namespace/:name/pod/:id/logs
 
-**Path:** /kube/:env/:namespace/:pod/logs
+
+### Ingresses: 
+
+**Path:** /kubernetes/namespace/:name/ingresses
+
+**Path:** /kubernetes/:env/namespace/:name/ingresses
+
+
+### Pods: 
+
+**Path:** /kubernetes/namespace/:name/pods
+
+**Path:** /kubernetes/:env/namespace/:name/pods
+
+
+### Secrets: 
+
+**Path:** /kubernetes/namespace/:namespace/secrets
+
+**Path:** /kubernetes/:env/namespace/:namespace/secrets
+
+
+### Secret: 
+
+**Path:** /kubernetes/namespace/:namespace/secret/:name
+
+**Path:** /kubernetes/:env/namespace/:namespace/secret/:name
+
+
+### ThirdPartyResources: Side Nav
+
+**Dynamic Path:** config.env?&#x60;/kubernetes/${config.env}/thirdpartyresources&#x60;:&#x27;/kubernetes/thirdpartyresources&#x27;
+
+**Path:** /kubernetes/thirdpartyresources
+
+**Path:** /kubernetes/:env/thirdpartyresources
+
+
+### Ingress: 
+
+**Path:** /kubernetes/namespace/:namespace/ingress/:name
+
+**Path:** /kubernetes/:env/namespace/:namespace/ingress/:name
+
+
+### ThirdPartyResource: 
+
+**Path:** /kubernetes/thirdpartyresource/:name
+
+**Path:** /kubernetes/:env/thirdpartyresource/:name
+
+
+### Daemonset: 
+
+**Path:** /kubernetes/namespace/:namespace/daemonset/:name
+
+**Path:** /kubernetes/:env/namespace/:namespace/daemonset/:name
+
+
+### Replicasets: 
+
+**Path:** /kubernetes/namespace/:namespace/replicasets
+
+**Path:** /kubernetes/:env/namespace/:namespace/replicasets
+
+
+### Replicaset: 
+
+**Path:** /kubernetes/namespace/:namespace/replicaset/:name
+
+**Path:** /kubernetes/:env/namespace/:namespace/replicaset/:name
+
+
+### Daemonsets: 
+
+**Path:** /kubernetes/namespace/:namespace/daemonsets
+
+**Path:** /kubernetes/:env/namespace/:namespace/daemonsets
+
+
+### Quotas: 
+
+**Path:** /kubernetes/namespace/:namespace/resourcequotas
+
+**Path:** /kubernetes/:env/namespace/:namespace/resourcequotas
+
+
+### Quota: 
+
+**Path:** /kubernetes/namespace/:namespace/resourcequotas/:name
+
+**Path:** /kubernetes/:env/namespace/:namespace/resourcequotas/:name
+
+
+### Deployments: 
+
+**Path:** /kubernetes/namespace/:namespace/deployments
+
+**Path:** /kubernetes/:env/namespace/:namespace/deployments
+
+
+### Services: 
+
+**Path:** /kubernetes/namespace/:namespace/services
+
+**Path:** /kubernetes/:env/namespace/:namespace/services
+
+
+### Deployment: 
+
+**Path:** /kubernetes/namespace/:namespace/deployment/:name
+
+**Path:** /kubernetes/:env/namespace/:namespace/deployment/:name
+
+
+### Service: 
+
+**Path:** /kubernetes/namespace/:namespace/service/:name
+
+**Path:** /kubernetes/:env/namespace/:namespace/service/:name
 
 
 

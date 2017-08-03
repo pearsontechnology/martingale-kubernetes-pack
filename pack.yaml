@@ -1,4 +1,4 @@
-name: Kube
+name: Kubernetes
 description: |
   This pack provides screens that allow users to view and manage a Kubernetes cluster.
 
@@ -8,15 +8,47 @@ description: |
 
   Where :env is an optional value to route to different clusters.
 pages:
-  Dashboard:
-    $ref: pages/dashboard.yaml
+  KubeDashboard:
+    $ref: pages/kubedashboard.yaml
   Namespaces:
-    $ref: pages/namespace.yaml
-  Pods:
-    $ref: pages/pods/listing.yaml
+    $ref: pages/namespaces.yaml
   Pod:
-    $ref: pages/pods/details.yaml
-  PodLogs:
-    $ref: pages/pods/logs.yaml
+    $ref: pages/pod.yaml
+  Logs:
+    $ref: pages/logs.yaml
+  Ingresses:
+    $ref: pages/ingresses.yaml
+  Pods:
+    $ref: pages/pods.yaml
+  Secrets:
+    $ref: pages/secrets.yaml
+  Secret:
+    $ref: pages/secret.yaml
+  ThirdPartyResources:
+    $ref: pages/thirdpartyresources.yaml
+  Ingress:
+    $ref: pages/ingress.yaml
+  ThirdPartyResource:
+    $ref: pages/thirdpartyresource.yaml
+  Daemonset:
+    $ref: pages/daemonset.yaml
+  Replicasets:
+    $ref: pages/replicasets.yaml
+  Replicaset:
+    $ref: pages/replicaset.yaml
+  Daemonsets:
+    $ref: pages/daemonsets.yaml
+  Quotas:
+    $ref: pages/quotas.yaml
+  Quota:
+    $ref: pages/quota.yaml
+  Deployments:
+    $ref: pages/deployments.yaml
+  Services:
+    $ref: pages/services.yaml
+  Deployment:
+    $ref: pages/deployment.yaml
+  Service:
+    $ref: pages/service.yaml
 icon:
   $ref: icon.yaml

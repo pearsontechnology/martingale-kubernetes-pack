@@ -1,112 +1,121 @@
-name: Kube
+name: Kubernetes
+description: >
+  This pack provides screens that allow users to view and manage a Kubernetes
+  cluster.
+
+
+  **Required Endpoints:**
+
+
+  /api[/:env]/kube should point to Kubernetes Master (EG: https://mykube)
+
+
+  Where :env is an optional value to route to different clusters.
 pages:
-  Dashboard:
-    templates:
-      section:
-        $type: Provider
-        props:
-          provide:
-            data:
-              root: items
-          Component:
-            $component: Table
+  KubeDashboard:
     $type: HeaderPage
     props:
-      title: Kube Dashboard
+      title: Kubernetes Dashboard
     children:
       - $type: Panel
         props:
           title: Status
+          maxHeight: 400
         children:
           $type: Provider
           props:
             provide:
               data:
-                root: items
                 url:
                   $map: >-
-                    params.env?`/api/${params.env}/kube/api/v1/componentstatuses`:'/api/kube/api/v1/componentstatuses'
+                    (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/componentstatuses`
+                root: items
                 mapper:
-                  $mapper: |
+                  $mapper: |-
                     props.map((comp)=>{
-                      const md = comp.metadata;
-                      const cnd = comp.conditions;
-                      const status = cnd.length===0?'unknown':
-                          cnd.map((c)=>c.type+'='+c.status).join(', ')
-                        ;
-                      return {
-                        name: md.name,
-                        status
-                      };
-                    })
+                                const md = comp.metadata;
+                                const cnd = comp.conditions;
+                                const status = cnd.length===0?'unknown':
+                                    cnd.map((c)=>c.type+'='+c.status).join(', ')
+                                  ;
+                                return {
+                                  name: md.name,
+                                  status
+                                };
+                              })
             Component:
               $component: Table
       - $type: Panel
         props:
           title: Events
+          maxHeight: 400
         children:
           $type: Provider
           props:
             provide:
               data:
-                root: items
                 url:
                   $map: >-
-                    params.env?`/api/${params.env}/kube/api/v1/events`:'/api/kube/api/v1/events'
+                    (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/events`
+                root: items
                 mapper:
-                  $mapper: |
-                    props.map((item)=>{
-                        const md = item.metadata;
-                        const io = item.involvedObject;
-                        return {
-                          type: item.type,
-                          namespace: md.namespace,
-                          target: io.kind,
-                          reason: item.reason,
-                          message: item.message,
-                          source: item.source.component,
-                          first: new Date(Date.parse(item.firstTimestamp)),
-                          last: item.lastTimestamp
-                        };
-                      }).sort((a1, a2)=>a1.first.getTime()-a2.first.getTime())
+                  $mapper: |-
+                    props
+                            .map((item)=>{
+                                const md = item.metadata;
+                                const io = item.involvedObject;
+                                return {
+                                  type: item.type,
+                                  namespace: md.namespace,
+                                  target: io.kind,
+                                  reason: item.reason,
+                                  message: item.message,
+                                  source: item.source.component,
+                                  first: new Date(Date.parse(item.firstTimestamp)),
+                                  last: item.lastTimestamp
+                                };
+                              }).sort((a1, a2)=>a1.first.getTime()-a2.first.getTime())
             Component:
               $component: Table
       - $type: Panel
         props:
           title: Nodes
-          children:
-            $type: Provider
-            props:
-              provide:
-                data:
-                  root: items
-                  url:
-                    $map: >-
-                      params.env?`/api/${params.env}/kube/api/v1/nodes`:'/api/kube/api/v1/nodes'
-                  mapper:
-                    $mapper: |
-                      props.map((item)=>{
-                        const md = item.metadata;
-                        const status = item.status;
-                        return {
-                          name: md.name,
-                          created: md.creationTimestamp,
-                          labels: md.labels,
-                          cpuCapacity: status.capacity.cpu,
-                          memoryCapacity: status.capacity.memory,
-                          podsCapacity: status.capacity.pods,
-                          cpuAllocatable: status.allocatable.cpu,
-                          memoryAllocatable: status.allocatable.memory,
-                          podsAllocatable: status.allocatable.pods
-                        };
-                      })
-              Component:
-                $component: Table
-    dynamicPath: 'config.env?`/kube/${config.env}`:''/kube'''
+          maxHeight: 400
+        children:
+          $type: Provider
+          props:
+            provide:
+              data:
+                url:
+                  $map: >-
+                    (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/nodes`
+                root: items
+                mapper:
+                  $mapper: |-
+                    props.map((item)=>{
+                                const md = item.metadata;
+                                const status = item.status;
+                                return {
+                                  name: md.name,
+                                  created: md.creationTimestamp,
+                                  labels: md.labels,
+                                  cpuCapacity: status.capacity.cpu,
+                                  memoryCapacity: status.capacity.memory,
+                                  podsCapacity: status.capacity.pods,
+                                  cpuAllocatable: status.allocatable.cpu,
+                                  memoryAllocatable: status.allocatable.memory,
+                                  podsAllocatable: status.allocatable.pods
+                                };
+                              })
+            Component:
+              $component: Table
+    dynamicPath: 'config.env?`/kubernetes/${config.env}`:''/kube'''
     paths:
       - /kube
-      - '/kube/:env'
-    caption: Dashboard
+      - '/kubernetes/:env'
+    sideNav: true
+    caption: Kube Dashboard
+    isDashboard: true
     icon:
       source: |
         <path
@@ -114,116 +123,76 @@ pages:
          />
       width: 800
       height: 1500
-    sideNav: true
   Namespaces:
     $type: HeaderPage
     props:
-      title: Namespaces
+      title: Kubernetes Namespaces
     children:
       $type: Panel
       children:
         $type: Provider
         props:
-          Component:
-            $component: ActionTable
-          props:
-            columns:
-              - name
-              - systemTimeCreated
-              - caption: Local Time Created
-                value: localTimeCreated
-              - caption: null
-                value: actions
-            actions:
-              - link: '${baseLink}/${name}/pods'
-                caption: Pods
-                btnStyle: primary
-                items:
-                  - link: '${baseLink}/${name}/ingresses'
-                    caption: Ingresses
           provide:
             data:
-              root: items
               url:
                 $map: >-
-                  params.env?`/api/${params.env}/kube/api/v1/namespaces`:'/api/kube/api/v1/namespaces'
+                  (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces`
+              root: items
               mapper:
-                $mapper: |
+                $mapper: |-
                   props.map(r=>{
                       const m = r.metadata;
                       return {
-                        baseLink: params.env?`/kube/${params.env}`:'/kube',
+                        baseLink: params.env?`/kubernetes/${params.env}`:'/kubernetes',
                         name: m.name,
                         systemTimeCreated: new Date(Date.parse(m.creationTimestamp)).toISOString(),
                         localTimeCreated: new Date(Date.parse(m.creationTimestamp)),
                       };
                     })
-    dynamicPath: 'config.env?`/kube/${config.env}/namespaces`:''/kube/namespaces'''
-    paths:
-      - /kube/namespaces
-      - '/kube/:env/namespaces'
-    caption: Namespaces
-    icon: Task
-    sideNav: true
-  Pods:
-    paths:
-      - '/kube/:namespace/pods'
-      - '/kube/:env/:namespace/pods'
-    $type: HeaderPage
-    props:
-      title: Namespaces
-    children:
-      $type: Panel
-      children:
-        $type: Provider
-        props:
           Component:
             $component: ActionTable
           props:
             suppress:
               - baseLink
             actions:
-              - link: '${baseLink}/${namespace}/${name}/logs'
-                caption: Logs
+              - link: >-
+                  ${baseLink}/namespace/${name}/pods${extractQueryParams(['apiBase'])}
+                caption: Pods
                 btnStyle: primary
                 items:
-                  - link: '${baseLink}/${namespace}/${name}/details'
-                    caption: Details
-                    btnStyle: default
-              - delete: '${baseLink}/api/v1/namespaces/${namespace}/pods/${name}'
-                caption: Refresh
-                message: 'Are you sure you want to refresh ${name}?'
-          provide:
-            data:
-              root: items
-              url:
-                $map: >-
-                  params.env?`/api/${params.env}/kube/api/v1/namespaces/${params.namespace}/pods`:'/api/kube/api/v1/namespaces/${params.namespace}/pods'
-              mapper:
-                $mapper: |
-                  props.map((pod)=>{
-                    const running = getObjectValue('status.containerStatuses[0].state.running', pod);
-                    return {
-                      baseLink: params.env?`/kube/${params.env}`:'/kube',
-                      name: getObjectValue('metadata.name', pod),
-                      node: getObjectValue('spec.nodeName', pod),
-                      namespace: getObjectValue('metadata.namespace', pod),
-                      created: getObjectValue('metadata.creationTimestamp', pod),
-                      phase: getObjectValue('status.phase', pod),
-                      status: running?getObjectValue('status.phase', pod):getObjectValue('status.containerStatuses[0].state.waiting.reason', pod, 'unknown'),
-                      restartCount: getObjectValue('status.containerStatuses[0].restartCount', pod, '0'),
-                      podIp: getObjectValue('status.podIP', pod),
-                      started: getObjectValue('startedAt', running)
-                    };
-                  })
-  Pod:
+                  - link: >-
+                      ${baseLink}/namespace/${name}/ingresses${extractQueryParams(['apiBase'])}
+                    caption: Ingresses
+                  - link: >-
+                      ${baseLink}/namespace/${name}/secrets${extractQueryParams(['apiBase'])}
+                    caption: Secrets
+                  - link: >-
+                      ${baseLink}/namespace/${name}/replicasets${extractQueryParams(['apiBase'])}
+                    caption: Replicasets
+                  - link: >-
+                      ${baseLink}/namespace/${name}/daemonsets${extractQueryParams(['apiBase'])}
+                    caption: Daemonsets
+                  - link: >-
+                      ${baseLink}/namespace/${name}/resourcequotas${extractQueryParams(['apiBase'])}
+                    caption: Resource Quotas
+                  - link: >-
+                      ${baseLink}/namespace/${name}/deployments${extractQueryParams(['apiBase'])}
+                    caption: Deployments
+                  - link: >-
+                      ${baseLink}/namespace/${name}/services${extractQueryParams(['apiBase'])}
+                    caption: Services
+    dynamicPath: 'config.env?`/kubernetes/${config.env}/namespaces`:''/kubernetes/namespaces'''
     paths:
-      - '/kube/:namespace/:pod/details'
-      - '/kube/:env/:namespace/:pod/details'
+      - /kubernetes/namespaces
+      - '/kubernetes/:env/namespaces'
+    icon: Cluster
+    sideNav: true
+    caption: Namespaces
+  Pod:
     $type: HeaderPage
     props:
       title:
-        $map: '`${params.namespace} - ${params.pod} - Details`'
+        $map: '`${params.name} - ${params.id} - Details`'
     children:
       $type: Panel
       children:
@@ -233,19 +202,19 @@ pages:
             json:
               url:
                 $map: >-
-                  `/api${params.env?'/'+params.env:''}/kube/api/v1/namespaces/${params.namespace}/pods/${params.pod}`
+                  (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.name}/pods/${params.id}`
           Component:
             $component: JsonView
           props:
             pretty: true
-  PodLogs:
     paths:
-      - '/kube/:namespace/:pod/logs'
-      - '/kube/:env/:namespace/:pod/logs'
+      - '/kubernetes/namespace/:name/pod/:id'
+      - '/kubernetes/:env/namespace/:name/pod/:id'
+  Logs:
     $type: HeaderPage
     props:
       title:
-        $map: '`${params.namespace} - ${params.pod} - Logs`'
+        $map: '`${params.name} - ${params.id} - Logs`'
     children:
       $type: Panel
       children:
@@ -255,7 +224,7 @@ pages:
             data:
               url:
                 $map: >-
-                  `/api${params.env?'/'+params.env:''}/kube/api/v1/namespaces/${params.namespace}/pods/${params.pod}/log?sinceSeconds=3600`
+                  (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.name}/pods/${params.id}/log?sinceSeconds=3600`
               mapper:
                 $mapper: |-
                   props.split("\n").filter(l=>!!l).map((l)=>{
@@ -268,6 +237,604 @@ pages:
               refresh: 5000
           Component:
             $component: Table
+    paths:
+      - '/kubernetes/namespace/:name/pod/:id/logs'
+      - '/kubernetes/:env/namespace/:name/pod/:id/logs'
+  Ingresses:
+    $type: HeaderPage
+    props:
+      title:
+        $map: '`${params.name} - Ingresses`'
+    children:
+      $type: Panel
+      children:
+        $type: Provider
+        props:
+          provide:
+            data:
+              url:
+                $map: >-
+                  (params.env?`/api/${params.env}/kube`:"/api/kube")+`/apis/extensions/v1beta1/namespaces/${params.name}/ingresses`
+              root: items
+              mapper:
+                $mapper: |-
+                  props.map((pod)=>{
+                    const hosts = getObjectValue('spec.rules', pod);
+                    return {
+                      baseLink: params.env?`/kubernetes/${params.env}`:'/kubernetes',
+                      name: getObjectValue('metadata.name', pod),
+                      namespace: getObjectValue('metadata.namespace', pod),
+                      created: getObjectValue('metadata.creationTimestamp', pod),
+                      hosts
+                    };
+                  })
+          Component:
+            $component: ActionTable
+          props:
+            suppress:
+              - baseLink
+            actions:
+              - link:
+                  $mapper: >-
+                    `${props.baseLink}/namespace/${params.name}/ingress/${props.name}${extractQueryParams(['apiBase'])}`
+                caption: Details
+                btnStyle: primary
+    paths:
+      - '/kubernetes/namespace/:name/ingresses'
+      - '/kubernetes/:env/namespace/:name/ingresses'
+  Pods:
+    $type: HeaderPage
+    props:
+      title:
+        $map: '`${params.name} - Pod''s`'
+    children:
+      $type: Panel
+      children:
+        $type: Provider
+        props:
+          provide:
+            data:
+              url:
+                $map: >-
+                  (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.name}/pods`
+              root: items
+              mapper:
+                $mapper: |-
+                  props.map((pod)=>{
+                                const running = getObjectValue('status.containerStatuses[0].state.running', pod);
+                                return {
+                                  name: getObjectValue('metadata.name', pod),
+                                  node: getObjectValue('spec.nodeName', pod),
+                                  namespace: getObjectValue('metadata.namespace', pod),
+                                  created: getObjectValue('metadata.creationTimestamp', pod),
+                                  phase: getObjectValue('status.phase', pod),
+                                  status: running?getObjectValue('status.phase', pod):getObjectValue('status.containerStatuses[0].state.waiting.reason', pod, 'unknown'),
+                                  restartCount: getObjectValue('status.containerStatuses[0].restartCount', pod, '0'),
+                                  podIp: getObjectValue('status.podIP', pod),
+                                  started: getObjectValue('startedAt', running)
+                                };
+                              })
+              refresh: 5000
+          Component:
+            $component: ActionTable
+          props:
+            actions:
+              - link:
+                  $mapper: >-
+                    `/kubernetes/namespace/${params.name}/pod/${props.name}/logs${extractQueryParams(['apiBase'])}`
+                caption: Logs
+                btnStyle: primary
+                items:
+                  - link:
+                      $mapper: >-
+                        `/kubernetes/namespace/${params.name}/pod/${props.name}${extractQueryParams(['apiBase'])}`
+                    caption: Details
+                    btnStyle: default
+              - delete:
+                  $mapper: >-
+                    (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.name}/pods/${props.name}`
+                caption: Refresh
+                message: 'Are you sure you want to refresh ${name}?'
+    paths:
+      - '/kubernetes/namespace/:name/pods'
+      - '/kubernetes/:env/namespace/:name/pods'
+  Secrets:
+    $type: HeaderPage
+    props:
+      title:
+        $map: '`${params.namespace} - Secrets`'
+    children:
+      $type: Panel
+      children:
+        $type: Provider
+        props:
+          provide:
+            data:
+              url:
+                $map: >-
+                  (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.namespace}/secrets`
+              root: items
+              mapper:
+                $mapper: |-
+                  props.map((pod)=>{
+                    return {
+                      baseLink: params.env?`/kubernetes/${params.env}`:'/kubernetes',
+                      name: getObjectValue('metadata.name', pod),
+                      namespace: getObjectValue('metadata.namespace', pod),
+                      created: getObjectValue('metadata.creationTimestamp', pod)
+                    };
+                  })
+          Component:
+            $component: ActionTable
+          props:
+            suppress:
+              - baseLink
+            actions:
+              - link:
+                  $mapper: >-
+                    `${props.baseLink}/namespace/${params.namespace}/secret/${props.name}${extractQueryParams(['apiBase'])}`
+                caption: Details
+                btnStyle: primary
+    paths:
+      - '/kubernetes/namespace/:namespace/secrets'
+      - '/kubernetes/:env/namespace/:namespace/secrets'
+  Secret:
+    $type: HeaderPage
+    props:
+      title:
+        $map: '`${params.namespace} - ${params.name}`'
+    children:
+      $type: Panel
+      props:
+        inset: true
+      children:
+        $type: Provider
+        props:
+          provide:
+            json:
+              url:
+                $map: >-
+                  (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.namespace}/secrets/${params.name}`
+          Component:
+            $component: JsonView
+          props:
+            pretty: true
+    paths:
+      - '/kubernetes/namespace/:namespace/secret/:name'
+      - '/kubernetes/:env/namespace/:namespace/secret/:name'
+  ThirdPartyResources:
+    caption: Third Party Resources
+    $type: HeaderPage
+    props:
+      title: Third Party Resources
+    children:
+      $type: Panel
+      children:
+        $type: Provider
+        props:
+          provide:
+            data:
+              url:
+                $map: >-
+                  (params.env?`/api/${params.env}/kube`:"/api/kube")+`/apis/extensions/v1beta1/thirdpartyresources`
+              root: items
+              mapper:
+                $mapper: |-
+                  props.map((tpr)=>{
+                    const md = tpr.metadata;
+                    return {
+                      baseLink: params.env?`/kubernetes/${params.env}`:'/kubernetes',
+                      name: md.name,
+                      namespace: md.namespace,
+                      created: md.creationTimestamp,
+                      labels: md.labels,
+                      description: tpr.description
+                    };
+                  })
+              refresh: 5000
+          Component:
+            $component: ActionTable
+          props:
+            actions:
+              - link: '${baseLink}/thirdpartyresource/${name}'
+                caption: Details
+                btnStyle: primary
+    dynamicPath: >-
+      config.env?`/kubernetes/${config.env}/thirdpartyresources`:'/kubernetes/thirdpartyresources'
+    paths:
+      - /kubernetes/thirdpartyresources
+      - '/kubernetes/:env/thirdpartyresources'
+    sideNav: true
+  Ingress:
+    $type: HeaderPage
+    props:
+      title:
+        $map: '`${params.namespace} - ${params.name}`'
+    children:
+      $type: Panel
+      props:
+        inset: true
+      children:
+        $type: Provider
+        props:
+          provide:
+            json:
+              url:
+                $map: >-
+                  (params.env?`/api/${params.env}/kube`:"/api/kube")+`/apis/extensions/v1beta1/namespaces/${params.namespace}/ingresses/${params.name}`
+          Component:
+            $component: JsonView
+          props:
+            pretty: true
+    paths:
+      - '/kubernetes/namespace/:namespace/ingress/:name'
+      - '/kubernetes/:env/namespace/:namespace/ingress/:name'
+  ThirdPartyResource:
+    $type: HeaderPage
+    props:
+      title:
+        $map: '`${params.namespace} - ${params.name}`'
+    children:
+      $type: Panel
+      props:
+        inset: true
+      children:
+        $type: Provider
+        props:
+          provide:
+            json:
+              url:
+                $map: >-
+                  (params.env?`/api/${params.env}/kube`:"/api/kube")+`/apis/extensions/v1beta1/namespaces/${params.namespace}/thirdpartyresources/${params.name}`
+          Component:
+            $component: JsonView
+          props:
+            pretty: true
+    paths:
+      - '/kubernetes/thirdpartyresource/:name'
+      - '/kubernetes/:env/thirdpartyresource/:name'
+  Daemonset:
+    $type: HeaderPage
+    props:
+      title:
+        $map: '`${params.namespace} - ${params.name}`'
+    children:
+      $type: Panel
+      props:
+        inset: true
+      children:
+        $type: Provider
+        props:
+          provide:
+            json:
+              url:
+                $map: >-
+                  (params.env?`/api/${params.env}/kube`:"/api/kube")+`/apis/extensions/v1beta1/namespaces/${params.namespace}/daemonsets/${params.name}`
+          Component:
+            $component: JsonView
+          props:
+            pretty: true
+    paths:
+      - '/kubernetes/namespace/:namespace/daemonset/:name'
+      - '/kubernetes/:env/namespace/:namespace/daemonset/:name'
+  Replicasets:
+    $type: HeaderPage
+    props:
+      title:
+        $map: '`${params.namespace} - Replicasets`'
+    children:
+      $type: Panel
+      children:
+        $type: Provider
+        props:
+          provide:
+            data:
+              url:
+                $map: >-
+                  (params.env?`/api/${params.env}/kube`:"/api/kube")+`/apis/extensions/v1beta1/namespaces/${params.namespace}/replicasets`
+              root: items
+              mapper:
+                $mapper: |-
+                  props.map((ds)=>{
+                    const md = ds.metadata;
+                    return {
+                      baseLink: params.env?`/kubernetes/${params.env}`:'/kubernetes',
+                      name: md.name,
+                      namespace: md.namespace,
+                      created: md.creationTimestamp,
+                      labels: md.labels
+                    };
+                  })
+          Component:
+            $component: ActionTable
+          props:
+            suppress:
+              - baseLink
+            actions:
+              - link:
+                  $mapper: >-
+                    `${props.baseLink}/namespace/${params.namespace}/replicaset/${props.name}${extractQueryParams(['apiBase'])}`
+                caption: Details
+                btnStyle: primary
+    paths:
+      - '/kubernetes/namespace/:namespace/replicasets'
+      - '/kubernetes/:env/namespace/:namespace/replicasets'
+  Replicaset:
+    $type: HeaderPage
+    props:
+      title:
+        $map: '`${params.namespace} - ${params.name}`'
+    children:
+      $type: Panel
+      props:
+        inset: true
+      children:
+        $type: Provider
+        props:
+          provide:
+            json:
+              url:
+                $map: >-
+                  (params.env?`/api/${params.env}/kube`:"/api/kube")+`/apis/extensions/v1beta1/namespaces/${params.namespace}/replicasets/${params.name}`
+          Component:
+            $component: JsonView
+          props:
+            pretty: true
+    paths:
+      - '/kubernetes/namespace/:namespace/replicaset/:name'
+      - '/kubernetes/:env/namespace/:namespace/replicaset/:name'
+  Daemonsets:
+    $type: HeaderPage
+    props:
+      title:
+        $map: '`${params.namespace} - Daemonsets`'
+    children:
+      $type: Panel
+      children:
+        $type: Provider
+        props:
+          provide:
+            data:
+              url:
+                $map: >-
+                  (params.env?`/api/${params.env}/kube`:"/api/kube")+`/apis/extensions/v1beta1/namespaces/${params.namespace}/daemonsets`
+              root: items
+              mapper:
+                $mapper: |-
+                  props.map((ds)=>{
+                    const md = ds.metadata;
+                    return {
+                      baseLink: params.env?`/kubernetes/${params.env}`:'/kubernetes',
+                      name: md.name,
+                      namespace: md.namespace,
+                      created: md.creationTimestamp,
+                      labels: md.labels
+                    };
+                  })
+          Component:
+            $component: ActionTable
+          props:
+            suppress:
+              - baseLink
+            actions:
+              - link: '${baseLink}/namespace/${namespace}/daemonset/${name}'
+                caption: Details
+                btnStyle: primary
+    paths:
+      - '/kubernetes/namespace/:namespace/daemonsets'
+      - '/kubernetes/:env/namespace/:namespace/daemonsets'
+  Quotas:
+    $type: HeaderPage
+    props:
+      title:
+        $map: '`${params.namespace} - Resource Quotas`'
+    children:
+      $type: Panel
+      children:
+        $type: Provider
+        props:
+          provide:
+            data:
+              url:
+                $map: >-
+                  (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.namespace}/resourcequotas`
+              root: items
+              mapper:
+                $mapper: |-
+                  props.map((ds)=>{
+                    const md = ds.metadata;
+                    const spec = ds.spec;
+                    const status = ds.status;
+                    return {
+                      baseLink: params.env?`/kubernetes/${params.env}`:'/kubernetes',
+                      name: md.name,
+                      namespace: md.namespace,
+                      created: md.creationTimestamp,
+                      persistentVolumeClaimsLimit: spec.hard.persistentvolumeclaims,
+                      podsLimit: spec.hard.pods,
+                      replicationControllersLimit: spec.hard.replicationcontrollers,
+                      secretsLimit: spec.hard.secrets,
+                      servicesLimit: spec.hard.services,
+                      persistentVolumeClaimsUsed: status.used.persistentvolumeclaims,
+                      podsUsed: status.used.pods,
+                      replicationControllersUsed: status.used.replicationcontrollers,
+                      secretsUsed: status.used.secrets,
+                      servicesUsed: status.used.services,
+                    };
+                  })
+          Component:
+            $component: ActionTable
+          props:
+            suppress:
+              - baseLink
+            actions:
+              - link:
+                  $mapper: >-
+                    `${props.baseLink}/namespace/${params.namespace}/resourcequotas/${props.name}${extractQueryParams(['apiBase'])}`
+                caption: Details
+                btnStyle: primary
+    paths:
+      - '/kubernetes/namespace/:namespace/resourcequotas'
+      - '/kubernetes/:env/namespace/:namespace/resourcequotas'
+  Quota:
+    $type: HeaderPage
+    props:
+      title:
+        $map: '`${params.namespace} - ${params.name}`'
+    children:
+      $type: Panel
+      props:
+        inset: true
+      children:
+        $type: Provider
+        props:
+          provide:
+            json:
+              url:
+                $map: >-
+                  (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.namespace}/resourcequotas/${params.name}`
+          Component:
+            $component: JsonView
+          props:
+            pretty: true
+    paths:
+      - '/kubernetes/namespace/:namespace/resourcequotas/:name'
+      - '/kubernetes/:env/namespace/:namespace/resourcequotas/:name'
+  Deployments:
+    $type: HeaderPage
+    props:
+      title:
+        $map: '`${params.namespace} - Deployments`'
+    children:
+      $type: Panel
+      children:
+        $type: Provider
+        props:
+          provide:
+            data:
+              url:
+                $map: >-
+                  (params.env?`/api/${params.env}/kube`:"/api/kube")+`/apis/extensions/v1beta1/namespaces/${params.namespace}/deployments`
+              root: items
+              mapper:
+                $mapper: |-
+                  props.map((ds)=>{
+                    const md = ds.metadata;
+                    return {
+                      baseLink: params.env?`/kubernetes/${params.env}`:'/kubernetes',
+                      name: md.name,
+                      namespace: md.namespace,
+                      created: md.creationTimestamp,
+                      labels: md.labels
+                    };
+                  })
+          Component:
+            $component: ActionTable
+          props:
+            suppress:
+              - baseLink
+            actions:
+              - link:
+                  $mapper: >-
+                    `${props.baseLink}/namespace/${params.namespace}/deployment/${props.name}${extractQueryParams(['apiBase'])}`
+                caption: Details
+                btnStyle: primary
+              - delete:
+                  $mapper: >-
+                    (params.env?`/api/${params.env}/kube`:"/api/kube")+`/apis/extensions/v1beta1/namespaces/${params.namespace}/deployments/${props.name}`
+                caption: Delete
+                message: 'Are you sure you want to delete ${name}?'
+    paths:
+      - '/kubernetes/namespace/:namespace/deployments'
+      - '/kubernetes/:env/namespace/:namespace/deployments'
+  Services:
+    $type: HeaderPage
+    props:
+      title:
+        $map: '`${params.namespace} - Services`'
+    children:
+      $type: Panel
+      children:
+        $type: Provider
+        props:
+          provide:
+            data:
+              url:
+                $map: >-
+                  (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.namespace}/services`
+              root: items
+              mapper:
+                $mapper: |-
+                  props.map((pod)=>{
+                    return {
+                      baseLink: params.env?`/kubernetes/${params.env}`:'/kubernetes',
+                      name: getObjectValue('metadata.name', pod),
+                      namespace: getObjectValue('metadata.namespace', pod),
+                      created: getObjectValue('metadata.creationTimestamp', pod)
+                    };
+                  })
+          Component:
+            $component: ActionTable
+          props:
+            suppress:
+              - baseLink
+            actions:
+              - link:
+                  $mapper: >-
+                    `${props.baseLink}/namespace/${params.namespace}/service/${props.name}${extractQueryParams(['apiBase'])}`
+                caption: Details
+                btnStyle: primary
+    paths:
+      - '/kubernetes/namespace/:namespace/services'
+      - '/kubernetes/:env/namespace/:namespace/services'
+  Deployment:
+    $type: HeaderPage
+    props:
+      title:
+        $map: '`${params.namespace} - ${params.name}`'
+    children:
+      $type: Panel
+      props:
+        inset: true
+      children:
+        $type: Provider
+        props:
+          provide:
+            json:
+              url:
+                $map: >-
+                  (params.env?`/api/${params.env}/kube`:"/api/kube")+`/apis/extensions/v1beta1/namespaces/${params.namespace}/deployments/${params.name}`
+          Component:
+            $component: JsonView
+          props:
+            pretty: true
+    paths:
+      - '/kubernetes/namespace/:namespace/deployment/:name'
+      - '/kubernetes/:env/namespace/:namespace/deployment/:name'
+  Service:
+    $type: HeaderPage
+    props:
+      title:
+        $map: '`${params.namespace} - ${params.name}`'
+    children:
+      $type: Panel
+      props:
+        inset: true
+      children:
+        $type: Provider
+        props:
+          provide:
+            json:
+              url:
+                $map: >-
+                  (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.namespace}/services/${params.name}`
+          Component:
+            $component: JsonView
+          props:
+            pretty: true
+    paths:
+      - '/kubernetes/namespace/:namespace/service/:name'
+      - '/kubernetes/:env/namespace/:namespace/service/:name'
 icon:
   source: |
     <path

@@ -1,0 +1,105 @@
+$type: HeaderPage
+props:
+  title: Kubernetes Dashboard
+children:
+  - $type: Panel
+    props:
+      title: Status
+      maxHeight: 400
+    children:
+      $type: Provider
+      props:
+        provide:
+          data:
+            url:
+              $map: >-
+                (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/componentstatuses`
+            root: items
+            mapper:
+              $mapper: |-
+                props.map((comp)=>{
+                            const md = comp.metadata;
+                            const cnd = comp.conditions;
+                            const status = cnd.length===0?'unknown':
+                                cnd.map((c)=>c.type+'='+c.status).join(', ')
+                              ;
+                            return {
+                              name: md.name,
+                              status
+                            };
+                          })
+        Component:
+          $component: Table
+  - $type: Panel
+    props:
+      title: Events
+      maxHeight: 400
+    children:
+      $type: Provider
+      props:
+        provide:
+          data:
+            url:
+              $map: >-
+                (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/events`
+            root: items
+            mapper:
+              $mapper: |-
+                props
+                        .map((item)=>{
+                            const md = item.metadata;
+                            const io = item.involvedObject;
+                            return {
+                              type: item.type,
+                              namespace: md.namespace,
+                              target: io.kind,
+                              reason: item.reason,
+                              message: item.message,
+                              source: item.source.component,
+                              first: new Date(Date.parse(item.firstTimestamp)),
+                              last: item.lastTimestamp
+                            };
+                          }).sort((a1, a2)=>a1.first.getTime()-a2.first.getTime())
+        Component:
+          $component: Table
+  - $type: Panel
+    props:
+      title: Nodes
+      maxHeight: 400
+    children:
+      $type: Provider
+      props:
+        provide:
+          data:
+            url:
+              $map: >-
+                (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/nodes`
+            root: items
+            mapper:
+              $mapper: |-
+                props.map((item)=>{
+                            const md = item.metadata;
+                            const status = item.status;
+                            return {
+                              name: md.name,
+                              created: md.creationTimestamp,
+                              labels: md.labels,
+                              cpuCapacity: status.capacity.cpu,
+                              memoryCapacity: status.capacity.memory,
+                              podsCapacity: status.capacity.pods,
+                              cpuAllocatable: status.allocatable.cpu,
+                              memoryAllocatable: status.allocatable.memory,
+                              podsAllocatable: status.allocatable.pods
+                            };
+                          })
+        Component:
+          $component: Table
+dynamicPath: config.env?`/kubernetes/${config.env}`:'/kube'
+paths:
+  - /kube
+  - /kubernetes/:env
+sideNav: true
+caption: Kube Dashboard
+isDashboard: true
+icon:
+  $ref: icon.yaml

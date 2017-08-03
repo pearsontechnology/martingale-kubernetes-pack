@@ -1,0 +1,23 @@
+$type: HeaderPage
+props:
+  title:
+    $map: '`${params.namespace} - ${params.name}`'
+children:
+  $type: Panel
+  props:
+    inset: true
+  children:
+    $type: Provider
+    props:
+      provide:
+        json:
+          url:
+            $map: >-
+              (params.env?`/api/${params.env}/kube`:"/api/kube")+`/apis/extensions/v1beta1/namespaces/${params.namespace}/daemonsets/${params.name}`
+      Component:
+        $component: JsonView
+      props:
+        pretty: true
+paths:
+  - /kubernetes/namespace/:namespace/daemonset/:name
+  - /kubernetes/:env/namespace/:namespace/daemonset/:name

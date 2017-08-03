@@ -1,0 +1,58 @@
+$type: HeaderPage
+props:
+  title: Kubernetes Namespaces
+children:
+  $type: Panel
+  children:
+    $type: Provider
+    props:
+      provide:
+        data:
+          url:
+            $map: >-
+              (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces`
+          root: items
+          mapper:
+            $mapper: |-
+              props.map(r=>{
+                  const m = r.metadata;
+                  return {
+                    baseLink: params.env?`/kubernetes/${params.env}`:'/kubernetes',
+                    name: m.name,
+                    systemTimeCreated: new Date(Date.parse(m.creationTimestamp)).toISOString(),
+                    localTimeCreated: new Date(Date.parse(m.creationTimestamp)),
+                  };
+                })
+      Component:
+        $component: ActionTable
+      props:
+        suppress:
+          - baseLink
+        actions:
+          - link: '${baseLink}/namespace/${name}/pods${extractQueryParams([''apiBase''])}'
+            caption: Pods
+            btnStyle: primary
+            items:
+              - link: ${baseLink}/namespace/${name}/ingresses${extractQueryParams(['apiBase'])}
+                caption: Ingresses
+              - link: ${baseLink}/namespace/${name}/secrets${extractQueryParams(['apiBase'])}
+                caption: Secrets
+              #- link: ${baseLink}/namespace/${name}/thirdpartyresources${extractQueryParams(['apiBase'])}
+              #  caption: Third Party Resources
+              - link: ${baseLink}/namespace/${name}/replicasets${extractQueryParams(['apiBase'])}
+                caption: Replicasets
+              - link: ${baseLink}/namespace/${name}/daemonsets${extractQueryParams(['apiBase'])}
+                caption: Daemonsets
+              - link: ${baseLink}/namespace/${name}/resourcequotas${extractQueryParams(['apiBase'])}
+                caption: Resource Quotas
+              - link: ${baseLink}/namespace/${name}/deployments${extractQueryParams(['apiBase'])}
+                caption: Deployments
+              - link: ${baseLink}/namespace/${name}/services${extractQueryParams(['apiBase'])}
+                caption: Services
+dynamicPath: config.env?`/kubernetes/${config.env}/namespaces`:'/kubernetes/namespaces'
+paths:
+  - /kubernetes/namespaces
+  - /kubernetes/:env/namespaces
+icon: Cluster
+sideNav: true
+caption: Namespaces

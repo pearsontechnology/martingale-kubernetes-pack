@@ -1,11 +1,7 @@
-description: Renders the logs of the passed in pod for the last 3600 seconds.
-paths:
-  - /kube/:namespace/:pod/logs
-  - /kube/:env/:namespace/:pod/logs
 $type: HeaderPage
 props:
   title:
-    $map: "`${params.namespace} - ${params.pod} - Logs`"
+    $map: '`${params.name} - ${params.id} - Logs`'
 children:
   $type: Panel
   children:
@@ -14,9 +10,10 @@ children:
       provide:
         data:
           url:
-            $map: "`/api${params.env?'/'+params.env:''}/kube/api/v1/namespaces/${params.namespace}/pods/${params.pod}/log?sinceSeconds=3600`"
+            $map: >-
+              (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.name}/pods/${params.id}/log?sinceSeconds=3600`
           mapper:
-            "$mapper": |-
+            $mapper: |-
               props.split("\n").filter(l=>!!l).map((l)=>{
                             try{
                               return JSON.parse(l);
@@ -27,3 +24,6 @@ children:
           refresh: 5000
       Component:
         $component: Table
+paths:
+  - /kubernetes/namespace/:name/pod/:id/logs
+  - /kubernetes/:env/namespace/:name/pod/:id/logs

@@ -1,0 +1,52 @@
+$type: HeaderPage
+props:
+  title:
+    $map: '`${params.namespace} - Resource Quotas`'
+children:
+  $type: Panel
+  children:
+    $type: Provider
+    props:
+      provide:
+        data:
+          url:
+            $map: >-
+              (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.namespace}/resourcequotas`
+          root: items
+          mapper:
+            $mapper: |-
+              props.map((ds)=>{
+                const md = ds.metadata;
+                const spec = ds.spec;
+                const status = ds.status;
+                return {
+                  baseLink: params.env?`/kubernetes/${params.env}`:'/kubernetes',
+                  name: md.name,
+                  namespace: md.namespace,
+                  created: md.creationTimestamp,
+                  persistentVolumeClaimsLimit: spec.hard.persistentvolumeclaims,
+                  podsLimit: spec.hard.pods,
+                  replicationControllersLimit: spec.hard.replicationcontrollers,
+                  secretsLimit: spec.hard.secrets,
+                  servicesLimit: spec.hard.services,
+                  persistentVolumeClaimsUsed: status.used.persistentvolumeclaims,
+                  podsUsed: status.used.pods,
+                  replicationControllersUsed: status.used.replicationcontrollers,
+                  secretsUsed: status.used.secrets,
+                  servicesUsed: status.used.services,
+                };
+              })
+      Component:
+        $component: ActionTable
+      props:
+        suppress:
+          - baseLink
+        actions:
+          - link:
+              $mapper: >-
+                `${props.baseLink}/namespace/${params.namespace}/resourcequotas/${props.name}${extractQueryParams(['apiBase'])}`
+            caption: Details
+            btnStyle: primary
+paths:
+  - /kubernetes/namespace/:namespace/resourcequotas
+  - /kubernetes/:env/namespace/:namespace/resourcequotas
