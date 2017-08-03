@@ -1,0 +1,50 @@
+$type: HeaderPage
+props:
+  title: Namespaces
+children:
+  $type: Panel
+  children:
+    $type: Provider
+    props:
+      Component:
+        $component: ActionTable
+      props:
+        columns:
+          - name
+          - systemTimeCreated
+          - caption: Local Time Created
+            value: localTimeCreated
+          - caption:
+            value: actions
+        actions:
+          - link: ${baseLink}/${name}/pods
+            caption: Pods
+            btnStyle: primary
+            items:
+              - link: ${baseLink}/${name}/ingresses
+                caption: Ingresses
+
+      provide:
+        data:
+          root: items
+          url:
+            $map: params.env?`/api/${params.env}/kube/api/v1/namespaces`:'/api/kube/api/v1/namespaces'
+          mapper:
+            $mapper: |
+              props.map(r=>{
+                  const m = r.metadata;
+                  return {
+                    baseLink: params.env?`/kube/${params.env}`:'/kube',
+                    name: m.name,
+                    systemTimeCreated: new Date(Date.parse(m.creationTimestamp)).toISOString(),
+                    localTimeCreated: new Date(Date.parse(m.creationTimestamp)),
+                  };
+                })
+
+dynamicPath: config.env?`/kube/${config.env}/namespaces`:'/kube/namespaces'
+paths:
+  - /kube/namespaces
+  - /kube/:env/namespaces
+caption: Namespaces
+icon: Task
+sideNav: true

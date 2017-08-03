@@ -1,0 +1,28 @@
+paths:
+  - /kube/:namespace/:pod/logs
+  - /kube/:env/:namespace/:pod/logs
+$type: HeaderPage
+props:
+  title:
+    $map: "`${params.namespace} - ${params.pod} - Logs`"
+children:
+  $type: Panel
+  children:
+    $type: Provider
+    props:
+      provide:
+        data:
+          url:
+            $map: "`/api${params.env?'/'+params.env:''}/kube/api/v1/namespaces/${params.namespace}/pods/${params.pod}/log?sinceSeconds=3600`"
+          mapper:
+            "$mapper": |-
+              props.split("\n").filter(l=>!!l).map((l)=>{
+                            try{
+                              return JSON.parse(l);
+                            }catch(e){
+                              return {message: l};
+                            }
+                          })
+          refresh: 5000
+      Component:
+        $component: Table

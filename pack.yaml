@@ -1,0 +1,14 @@
+name: Kube
+pages:
+  Dashboard:
+    $ref: pages/dashboard.yaml
+  Namespaces:
+    $ref: pages/namespace.yaml
+  Pods:
+    $ref: pages/pods/listing.yaml
+  Pod:
+    $ref: pages/pods/details.yaml
+  PodLogs:
+    $ref: pages/pods/logs.yaml
+icon:
+  $ref: icon.yaml

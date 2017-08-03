@@ -1,0 +1,103 @@
+templates:
+  section: &TABLE_SECTION
+    $type: Provider
+    props: &props
+      provide: &provide
+        data: &data
+          root: items
+      Component:
+        $component: Table
+$type: HeaderPage
+props:
+  title: Kube Dashboard
+children:
+  - $type: Panel
+    props:
+      title: Status
+    children:
+      <<: *TABLE_SECTION
+      props:
+        <<: *props
+        provide:
+          data:
+            <<: *data
+            url:
+              $map: "params.env?`/api/${params.env}/kube/api/v1/componentstatuses`:'/api/kube/api/v1/componentstatuses'"
+            mapper:
+              $mapper: |
+                props.map((comp)=>{
+                  const md = comp.metadata;
+                  const cnd = comp.conditions;
+                  const status = cnd.length===0?'unknown':
+                      cnd.map((c)=>c.type+'='+c.status).join(', ')
+                    ;
+                  return {
+                    name: md.name,
+                    status
+                  };
+                })
+  - $type: Panel
+    props:
+      title: Events
+    children:
+      <<: *TABLE_SECTION
+      props:
+        <<: *props
+        provide:
+          data:
+            <<: *data
+            url:
+              $map: "params.env?`/api/${params.env}/kube/api/v1/events`:'/api/kube/api/v1/events'"
+            mapper:
+              $mapper: |
+                props.map((item)=>{
+                    const md = item.metadata;
+                    const io = item.involvedObject;
+                    return {
+                      type: item.type,
+                      namespace: md.namespace,
+                      target: io.kind,
+                      reason: item.reason,
+                      message: item.message,
+                      source: item.source.component,
+                      first: new Date(Date.parse(item.firstTimestamp)),
+                      last: item.lastTimestamp
+                    };
+                  }).sort((a1, a2)=>a1.first.getTime()-a2.first.getTime())
+  - $type: Panel
+    props:
+      title: Nodes
+      children:
+        <<: *TABLE_SECTION
+        props:
+          <<: *props
+          provide:
+            data:
+              <<: *data
+              url:
+                $map: "params.env?`/api/${params.env}/kube/api/v1/nodes`:'/api/kube/api/v1/nodes'"
+              mapper:
+                $mapper: |
+                  props.map((item)=>{
+                    const md = item.metadata;
+                    const status = item.status;
+                    return {
+                      name: md.name,
+                      created: md.creationTimestamp,
+                      labels: md.labels,
+                      cpuCapacity: status.capacity.cpu,
+                      memoryCapacity: status.capacity.memory,
+                      podsCapacity: status.capacity.pods,
+                      cpuAllocatable: status.allocatable.cpu,
+                      memoryAllocatable: status.allocatable.memory,
+                      podsAllocatable: status.allocatable.pods
+                    };
+                  })
+dynamicPath: config.env?`/kube/${config.env}`:'/kube'
+paths:
+  - /kube
+  - /kube/:env
+caption: Dashboard
+icon:
+  $ref: icon.yaml
+sideNav: true
