@@ -2,6 +2,13 @@
 
 This pack provides screens that allow users to view and manage a Kubernetes cluster.
 
+**Required Endpoints:**
+
+/api[/:env]/kube should point to Kubernetes Master (EG: https://mykube)
+
+Where :env is an optional value to route to different clusters.
+
+
 ## Included Pages
 ### Dashboard: Side Nav
 

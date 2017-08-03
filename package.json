@@ -6,7 +6,8 @@
   "author": "Jeremy Darling <jeremy.darling@pearson.com>",
   "scripts": {
     "build": "mpack build",
-    "test": "mpack test"
+    "test": "mpack test",
+    "doc": "mpack doc"
   },
   "dependencies": {
     "martingale-pack-builder": "^0.0.1"
