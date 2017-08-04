@@ -48,8 +48,8 @@ children:
           - delete:
               $mapper: >-
                 (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.name}/pods/${props.name}`
-            caption: Refresh
-            message: 'Are you sure you want to refresh ${name}?'
+            caption: Delete
+            message: 'Are you sure you want to delete ${name}?'
 paths:
   - /kubernetes/namespace/:name/pods
   - /kubernetes/:env/namespace/:name/pods
