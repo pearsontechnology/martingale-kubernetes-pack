@@ -1,7 +1,7 @@
 $type: HeaderPage
 props:
   title:
-    $map: '`${params.resource} - Logs`'
+    $map: '`${params.name} - ${params.id} - Logs`'
 children:
   $type: Panel
   children:
