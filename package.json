@@ -6,7 +6,7 @@
   "author": "Jeremy Darling <jeremy.darling@pearson.com>",
   "scripts": {
     "build": "mpack build",
-    "test": "mpack test",
+    "test": "mpack test -p 8081",
     "doc": "mpack doc"
   },
   "dependencies": {
