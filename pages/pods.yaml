@@ -1,58 +1,48 @@
-$type: HeaderPage
+$type: DataViewPage
 props:
   title:
     $map: '`${params.name} - Pod''s`'
-children:
-  $type: Panel
-  children:
-    $type: Provider
-    props:
-      provide:
-        data:
-          url:
-            $map: >-
-              (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.name}/pods`
-          root: items
-          mapper:
-            $mapper: |-
-              props.map((pod)=>{
-                            const containers = getObjectValue('spec.containers', pod);
-                            return containers.map((container, index)=>{
-                              const running = getObjectValue('status.containerStatuses['+index+'].state.running', pod);
-                              return {
-                                baseLink: params.env?`/kubernetes/${params.env}`:'/kubernetes',
-                                name: getObjectValue('metadata.name', pod),
-                                node: getObjectValue('spec.nodeName', pod),
-                                container: container.name,
-                                namespace: getObjectValue('metadata.namespace', pod),
-                                created: getObjectValue('metadata.creationTimestamp', pod),
-                                phase: getObjectValue('status.phase', pod),
-                                status: running?getObjectValue('status.phase', pod):getObjectValue('status.containerStatuses[0].state.waiting.reason', pod, 'unknown'),
-                                restartCount: getObjectValue('status.containerStatuses[0].restartCount', pod, '0'),
-                                podIp: getObjectValue('status.podIP', pod),
-                                started: getObjectValue('startedAt', running)
-                              };
-                            });
-                          }).reduce((a,b)=>a.concat(b),[])
-          refresh: 5000
-      Component:
-        $component: ActionTable
-      props:
-        suppress:
-          - baseLink
-        actions:
-          - link: ${baseLink}/namespace/${namespace}/pod/${name}/${container}/logs
-            caption: Logs
-            btnStyle: primary
-            items:
-              - link: ${baseLink}/namespace/${namespace}/pod/${name}
-                caption: Details
-                btnStyle: default
-          - delete:
-              $mapper: >-
-                (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.name}/pods/${props.name}`
-            caption: Delete
-            message: 'Are you sure you want to delete ${name}?'
+  url:
+    $map: >-
+      (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.name}/pods`
+  root: items
+  mapper:
+    $mapper: |-
+      props.map((pod)=>{
+                    const containers = getObjectValue('spec.containers', pod);
+                    return containers.map((container, index)=>{
+                      const running = getObjectValue('status.containerStatuses['+index+'].state.running', pod);
+                      return {
+                        baseLink: params.env?`/kubernetes/${params.env}`:'/kubernetes',
+                        name: getObjectValue('metadata.name', pod),
+                        node: getObjectValue('spec.nodeName', pod),
+                        container: container.name,
+                        namespace: getObjectValue('metadata.namespace', pod),
+                        created: getObjectValue('metadata.creationTimestamp', pod),
+                        phase: getObjectValue('status.phase', pod),
+                        status: running?getObjectValue('status.phase', pod):getObjectValue('status.containerStatuses[0].state.waiting.reason', pod, 'unknown'),
+                        restartCount: getObjectValue('status.containerStatuses[0].restartCount', pod, '0'),
+                        podIp: getObjectValue('status.podIP', pod),
+                        started: getObjectValue('startedAt', running)
+                      };
+                    });
+                  }).reduce((a,b)=>a.concat(b),[])
+  refresh: 5000
+  suppress:
+    - baseLink
+  actions:
+    - link: ${baseLink}/namespace/${namespace}/pod/${name}/${container}/logs
+      caption: Logs
+      btnStyle: primary
+      items:
+        - link: ${baseLink}/namespace/${namespace}/pod/${name}
+          caption: Details
+          btnStyle: default
+    - delete:
+        $mapper: >-
+          (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.name}/pods/${props.name}`
+      caption: Delete
+      message: 'Are you sure you want to delete ${name}?'
 paths:
   - /kubernetes/namespace/:name/pods
   - /kubernetes/:env/namespace/:name/pods

@@ -1,23 +1,10 @@
-$type: HeaderPage
+$type: DataViewPage
 props:
   title:
     $map: '`${params.namespace} - ${params.name}`'
-children:
-  $type: Panel
-  props:
-    inset: true
-  children:
-    $type: Provider
-    props:
-      provide:
-        json:
-          url:
-            $map: >-
-              (params.env?`/api/${params.env}/kube`:"/api/kube")+`/apis/extensions/v1beta1/namespaces/${params.namespace}/ingresses/${params.name}`
-      Component:
-        $component: JsonView
-      props:
-        pretty: true
+  url:
+    $map: >-
+      (params.env?`/api/${params.env}/kube`:"/api/kube")+`/apis/extensions/v1beta1/namespaces/${params.namespace}/ingresses/${params.name}`
 paths:
   - /kubernetes/namespace/:namespace/ingress/:name
   - /kubernetes/:env/namespace/:namespace/ingress/:name

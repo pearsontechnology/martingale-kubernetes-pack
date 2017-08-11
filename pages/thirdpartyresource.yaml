@@ -1,23 +1,9 @@
-$type: HeaderPage
+$type: DataViewPage
 props:
   title:
-    $map: '`${params.namespace} - ${params.name}`'
-children:
-  $type: Panel
-  props:
-    inset: true
-  children:
-    $type: Provider
-    props:
-      provide:
-        json:
-          url:
-            $map: >-
-              (params.env?`/api/${params.env}/kube`:"/api/kube")+`/apis/extensions/v1beta1/namespaces/${params.namespace}/thirdpartyresources/${params.name}`
-      Component:
-        $component: JsonView
-      props:
-        pretty: true
+    $map: '`${params.name}`'
+  url:
+    $map: (params.env?`/api/${params.env}/kube`:"/api/kube")+`/apis/${params.name.replace(/[^\.]+\./, '')}/v1/${plural(params.name.replace(/\..+/, ''))}`
 paths:
   - /kubernetes/thirdpartyresource/:name
   - /kubernetes/:env/thirdpartyresource/:name

@@ -1,41 +1,31 @@
-$type: HeaderPage
+$type: DataViewPage
 props:
   title:
     $map: '`${params.name} - Ingresses`'
-children:
-  $type: Panel
-  children:
-    $type: Provider
-    props:
-      provide:
-        data:
-          url:
-            $map: >-
-              (params.env?`/api/${params.env}/kube`:"/api/kube")+`/apis/extensions/v1beta1/namespaces/${params.name}/ingresses`
-          root: items
-          mapper:
-            $mapper: |-
-              props.map((pod)=>{
-                const hosts = getObjectValue('spec.rules', pod);
-                return {
-                  baseLink: params.env?`/kubernetes/${params.env}`:'/kubernetes',
-                  name: getObjectValue('metadata.name', pod),
-                  namespace: getObjectValue('metadata.namespace', pod),
-                  created: getObjectValue('metadata.creationTimestamp', pod),
-                  hosts
-                };
-              })
-      Component:
-        $component: ActionTable
-      props:
-        suppress:
-          - baseLink
-        actions:
-          - link:
-              $mapper: >-
-                `${props.baseLink}/namespace/${params.name}/ingress/${props.name}${extractQueryParams(['apiBase'])}`
-            caption: Details
-            btnStyle: primary
+  url:
+    $map: >-
+      (params.env?`/api/${params.env}/kube`:"/api/kube")+`/apis/extensions/v1beta1/namespaces/${params.name}/ingresses`
+  root: items
+  mapper:
+    $mapper: |-
+      props.map((pod)=>{
+        const hosts = getObjectValue('spec.rules', pod);
+        return {
+          baseLink: params.env?`/kubernetes/${params.env}`:'/kubernetes',
+          name: getObjectValue('metadata.name', pod),
+          namespace: getObjectValue('metadata.namespace', pod),
+          created: getObjectValue('metadata.creationTimestamp', pod),
+          hosts
+        };
+      })
+  suppress:
+    - baseLink
+  actions:
+    - link:
+        $mapper: >-
+          `${props.baseLink}/namespace/${params.name}/ingress/${props.name}${extractQueryParams(['apiBase'])}`
+      caption: Details
+      btnStyle: primary
 paths:
   - /kubernetes/namespace/:name/ingresses
   - /kubernetes/:env/namespace/:name/ingresses
