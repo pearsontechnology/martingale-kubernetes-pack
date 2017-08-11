@@ -1,29 +1,37 @@
-$type: HeaderPage
+description: Provides a view of the current logs for a given resource
+$type: DataViewPage
 props:
   title:
-    $map: '`${params.name} - ${params.id} - Logs`'
-children:
-  $type: Panel
-  children:
-    $type: Provider
-    props:
-      provide:
-        data:
-          url:
-            $map: >-
-              (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.name}/pods/${params.id}/log?sinceSeconds=3600`
-          mapper:
-            $mapper: |-
-              props.split("\n").filter(l=>!!l).map((l)=>{
-                            try{
-                              return JSON.parse(l);
-                            }catch(e){
-                              return {message: l};
-                            }
-                          })
-          refresh: 5000
-      Component:
-        $component: Table
+    $map: '`${params.name} - ${params.id} - ${params.container} Logs`'
+  url:
+    $map: (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.name}/pods/${params.id}/log?sinceSeconds=3600&container=${params.container}`
+  mapper:
+    $mapper: |-
+      (()=>{
+        const logStrToLines = (logs)=>{
+          return logs.split("\n").filter(l=>!!l).map((l)=>{
+              try{
+                return JSON.parse(l);
+              }catch(e){
+                return {message: l};
+              }
+            });
+        };
+        const getLogs = (logs)=>{
+          if(!logs){
+            return [{message: ''}];
+          }
+          if(typeof(logs)==='string'){
+            return logStrToLines(logs);
+          }
+          if(Array.isArray(logs)){
+            return logs;
+          }
+          return [logs];
+        };
+        const logs = getLogs(props);
+        return logs;
+      })()
 paths:
-  - /kubernetes/namespace/:name/pod/:id/logs
-  - /kubernetes/:env/namespace/:name/pod/:id/logs
+  - /kubernetes/namespace/:name/pod/:id/:container/logs
+  - /kubernetes/:env/namespace/:name/pod/:id/:container/logs

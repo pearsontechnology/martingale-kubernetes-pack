@@ -24,6 +24,12 @@ children:
                   name: md.name,
                   namespace: md.namespace,
                   created: md.creationTimestamp,
+                  persistentVolumeClaims: `${status.used.persistentvolumeclaims} of ${spec.hard.persistentvolumeclaims}`,
+                  pods: `${status.used.pods} of ${spec.hard.pods}`,
+                  secrets: `${status.used.secrets} of ${spec.hard.secrets}`,
+                  replicationControllers: `${status.used.replicationcontrollers} of ${spec.hard.replicationcontrollers}`,
+                  services: `${status.used.services} of ${spec.hard.services}`
+                  /*
                   persistentVolumeClaimsLimit: spec.hard.persistentvolumeclaims,
                   podsLimit: spec.hard.pods,
                   replicationControllersLimit: spec.hard.replicationcontrollers,
@@ -34,6 +40,7 @@ children:
                   replicationControllersUsed: status.used.replicationcontrollers,
                   secretsUsed: status.used.secrets,
                   servicesUsed: status.used.services,
+                  */
                 };
               })
       Component:

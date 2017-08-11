@@ -211,35 +211,44 @@ pages:
       - '/kubernetes/namespace/:name/pod/:id'
       - '/kubernetes/:env/namespace/:name/pod/:id'
   Logs:
-    $type: HeaderPage
+    description: Provides a view of the current logs for a given resource
+    $type: DataViewPage
     props:
       title:
-        $map: '`${params.name} - ${params.id} - Logs`'
-    children:
-      $type: Panel
-      children:
-        $type: Provider
-        props:
-          provide:
-            data:
-              url:
-                $map: >-
-                  (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.name}/pods/${params.id}/log?sinceSeconds=3600`
-              mapper:
-                $mapper: |-
-                  props.split("\n").filter(l=>!!l).map((l)=>{
-                                try{
-                                  return JSON.parse(l);
-                                }catch(e){
-                                  return {message: l};
-                                }
-                              })
-              refresh: 5000
-          Component:
-            $component: Table
+        $map: '`${params.name} - ${params.id} - ${params.container} Logs`'
+      url:
+        $map: >-
+          (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.name}/pods/${params.id}/log?sinceSeconds=3600&container=${params.container}`
+      mapper:
+        $mapper: |-
+          (()=>{
+            const logStrToLines = (logs)=>{
+              return logs.split("\n").filter(l=>!!l).map((l)=>{
+                  try{
+                    return JSON.parse(l);
+                  }catch(e){
+                    return {message: l};
+                  }
+                });
+            };
+            const getLogs = (logs)=>{
+              if(!logs){
+                return [{message: ''}];
+              }
+              if(typeof(logs)==='string'){
+                return logStrToLines(logs);
+              }
+              if(Array.isArray(logs)){
+                return logs;
+              }
+              return [logs];
+            };
+            const logs = getLogs(props);
+            return logs;
+          })()
     paths:
-      - '/kubernetes/namespace/:name/pod/:id/logs'
-      - '/kubernetes/:env/namespace/:name/pod/:id/logs'
+      - '/kubernetes/namespace/:name/pod/:id/:container/logs'
+      - '/kubernetes/:env/namespace/:name/pod/:id/:container/logs'
   Ingresses:
     $type: HeaderPage
     props:
@@ -301,33 +310,37 @@ pages:
               mapper:
                 $mapper: |-
                   props.map((pod)=>{
-                                const running = getObjectValue('status.containerStatuses[0].state.running', pod);
-                                return {
-                                  name: getObjectValue('metadata.name', pod),
-                                  node: getObjectValue('spec.nodeName', pod),
-                                  namespace: getObjectValue('metadata.namespace', pod),
-                                  created: getObjectValue('metadata.creationTimestamp', pod),
-                                  phase: getObjectValue('status.phase', pod),
-                                  status: running?getObjectValue('status.phase', pod):getObjectValue('status.containerStatuses[0].state.waiting.reason', pod, 'unknown'),
-                                  restartCount: getObjectValue('status.containerStatuses[0].restartCount', pod, '0'),
-                                  podIp: getObjectValue('status.podIP', pod),
-                                  started: getObjectValue('startedAt', running)
-                                };
-                              })
+                                const containers = getObjectValue('spec.containers', pod);
+                                return containers.map((container, index)=>{
+                                  const running = getObjectValue('status.containerStatuses['+index+'].state.running', pod);
+                                  return {
+                                    baseLink: params.env?`/kubernetes/${params.env}`:'/kubernetes',
+                                    name: getObjectValue('metadata.name', pod),
+                                    node: getObjectValue('spec.nodeName', pod),
+                                    container: container.name,
+                                    namespace: getObjectValue('metadata.namespace', pod),
+                                    created: getObjectValue('metadata.creationTimestamp', pod),
+                                    phase: getObjectValue('status.phase', pod),
+                                    status: running?getObjectValue('status.phase', pod):getObjectValue('status.containerStatuses[0].state.waiting.reason', pod, 'unknown'),
+                                    restartCount: getObjectValue('status.containerStatuses[0].restartCount', pod, '0'),
+                                    podIp: getObjectValue('status.podIP', pod),
+                                    started: getObjectValue('startedAt', running)
+                                  };
+                                });
+                              }).reduce((a,b)=>a.concat(b),[])
               refresh: 5000
           Component:
             $component: ActionTable
           props:
+            suppress:
+              - baseLink
             actions:
-              - link:
-                  $mapper: >-
-                    `/kubernetes/namespace/${params.name}/pod/${props.name}/logs${extractQueryParams(['apiBase'])}`
+              - link: >-
+                  ${baseLink}/namespace/${namespace}/pod/${name}/${container}/logs
                 caption: Logs
                 btnStyle: primary
                 items:
-                  - link:
-                      $mapper: >-
-                        `/kubernetes/namespace/${params.name}/pod/${props.name}${extractQueryParams(['apiBase'])}`
+                  - link: '${baseLink}/namespace/${namespace}/pod/${name}'
                     caption: Details
                     btnStyle: default
               - delete:
@@ -650,6 +663,12 @@ pages:
                       name: md.name,
                       namespace: md.namespace,
                       created: md.creationTimestamp,
+                      persistentVolumeClaims: `${status.used.persistentvolumeclaims} of ${spec.hard.persistentvolumeclaims}`,
+                      pods: `${status.used.pods} of ${spec.hard.pods}`,
+                      secrets: `${status.used.secrets} of ${spec.hard.secrets}`,
+                      replicationControllers: `${status.used.replicationcontrollers} of ${spec.hard.replicationcontrollers}`,
+                      services: `${status.used.services} of ${spec.hard.services}`
+                      /*
                       persistentVolumeClaimsLimit: spec.hard.persistentvolumeclaims,
                       podsLimit: spec.hard.pods,
                       replicationControllersLimit: spec.hard.replicationcontrollers,
@@ -660,6 +679,7 @@ pages:
                       replicationControllersUsed: status.used.replicationcontrollers,
                       secretsUsed: status.used.secrets,
                       servicesUsed: status.used.services,
+                      */
                     };
                   })
           Component:

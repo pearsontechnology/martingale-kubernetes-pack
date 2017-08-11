@@ -50,9 +50,11 @@ Where :env is an optional value to route to different clusters.
 
 ### Logs: 
 
-**Path:** /kubernetes/namespace/:name/pod/:id/logs
+Provides a view of the current logs for a given resource
 
-**Path:** /kubernetes/:env/namespace/:name/pod/:id/logs
+**Path:** /kubernetes/namespace/:name/pod/:id/:container/logs
+
+**Path:** /kubernetes/:env/namespace/:name/pod/:id/:container/logs
 
 
 ### Ingresses: 

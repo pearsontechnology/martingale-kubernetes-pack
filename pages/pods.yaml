@@ -16,33 +16,36 @@ children:
           mapper:
             $mapper: |-
               props.map((pod)=>{
-                            const running = getObjectValue('status.containerStatuses[0].state.running', pod);
-                            return {
-                              name: getObjectValue('metadata.name', pod),
-                              node: getObjectValue('spec.nodeName', pod),
-                              namespace: getObjectValue('metadata.namespace', pod),
-                              created: getObjectValue('metadata.creationTimestamp', pod),
-                              phase: getObjectValue('status.phase', pod),
-                              status: running?getObjectValue('status.phase', pod):getObjectValue('status.containerStatuses[0].state.waiting.reason', pod, 'unknown'),
-                              restartCount: getObjectValue('status.containerStatuses[0].restartCount', pod, '0'),
-                              podIp: getObjectValue('status.podIP', pod),
-                              started: getObjectValue('startedAt', running)
-                            };
-                          })
+                            const containers = getObjectValue('spec.containers', pod);
+                            return containers.map((container, index)=>{
+                              const running = getObjectValue('status.containerStatuses['+index+'].state.running', pod);
+                              return {
+                                baseLink: params.env?`/kubernetes/${params.env}`:'/kubernetes',
+                                name: getObjectValue('metadata.name', pod),
+                                node: getObjectValue('spec.nodeName', pod),
+                                container: container.name,
+                                namespace: getObjectValue('metadata.namespace', pod),
+                                created: getObjectValue('metadata.creationTimestamp', pod),
+                                phase: getObjectValue('status.phase', pod),
+                                status: running?getObjectValue('status.phase', pod):getObjectValue('status.containerStatuses[0].state.waiting.reason', pod, 'unknown'),
+                                restartCount: getObjectValue('status.containerStatuses[0].restartCount', pod, '0'),
+                                podIp: getObjectValue('status.podIP', pod),
+                                started: getObjectValue('startedAt', running)
+                              };
+                            });
+                          }).reduce((a,b)=>a.concat(b),[])
           refresh: 5000
       Component:
         $component: ActionTable
       props:
+        suppress:
+          - baseLink
         actions:
-          - link:
-              $mapper: >-
-                `/kubernetes/namespace/${params.name}/pod/${props.name}/logs${extractQueryParams(['apiBase'])}`
+          - link: ${baseLink}/namespace/${namespace}/pod/${name}/${container}/logs
             caption: Logs
             btnStyle: primary
             items:
-              - link:
-                  $mapper: >-
-                    `/kubernetes/namespace/${params.name}/pod/${props.name}${extractQueryParams(['apiBase'])}`
+              - link: ${baseLink}/namespace/${namespace}/pod/${name}
                 caption: Details
                 btnStyle: default
           - delete:
