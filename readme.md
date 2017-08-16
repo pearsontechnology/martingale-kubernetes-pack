@@ -87,6 +87,8 @@ Provides a view of the current logs for a given resource
 
 ### ThirdPartyResources: Side Nav
 
+**Icon:** Gateway
+
 **Dynamic Path:** config.env?&#x60;/kubernetes/${config.env}/thirdpartyresources&#x60;:&#x27;/kubernetes/thirdpartyresources&#x27;
 
 **Path:** /kubernetes/thirdpartyresources
