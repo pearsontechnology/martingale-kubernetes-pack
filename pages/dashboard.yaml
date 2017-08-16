@@ -13,7 +13,7 @@ children:
           data:
             url:
               $map: >-
-                (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/componentstatuses`
+                `${config.host}/api/v1/componentstatuses`
             root: items
             mapper:
               $mapper: |-
@@ -41,7 +41,7 @@ children:
           data:
             url:
               $map: >-
-                (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/events`
+                `${config.host}/api/v1/events`
             root: items
             mapper:
               $mapper: |-
@@ -73,7 +73,7 @@ children:
           data:
             url:
               $map: >-
-                (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/nodes`
+                `${config.host}/api/v1/nodes`
             root: items
             mapper:
               $mapper: |-
@@ -94,7 +94,7 @@ children:
                           })
         Component:
           $component: Table
-dynamicPath: config.env?`/kubernetes/${config.env}`:'/kube'
+dynamicPath: config.env?`/kubernetes/${config.env}`:'/kubernetes'
 paths:
   - /kube
   - /kubernetes/:env

@@ -11,6 +11,14 @@ This pack provides screens that allow users to view and manage a Kubernetes clus
 Where :env is an optional value to route to different clusters.
 
 
+## Configuration Options
+
+### env: Environment name for the instance of the plugin.
+
+
+### host: Hostname or host path to the instance of the Kubernetes API.
+**Default Value:** /api/kubernetes
+
 ## Included Pages
 ### KubeDashboard: Side Nav
 
@@ -23,7 +31,7 @@ Where :env is an optional value to route to different clusters.
   </g>
 </svg>
 
-**Dynamic Path:** config.env?&#x60;/kubernetes/${config.env}&#x60;:&#x27;/kube&#x27;
+**Dynamic Path:** config.env?&#x60;/kubernetes/${config.env}&#x60;:&#x27;/kubernetes&#x27;
 
 **Path:** /kube
 

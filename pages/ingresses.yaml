@@ -3,8 +3,8 @@ props:
   title:
     $map: '`${params.name} - Ingresses`'
   url:
-    $map: >-
-      (params.env?`/api/${params.env}/kube`:"/api/kube")+`/apis/extensions/v1beta1/namespaces/${params.name}/ingresses`
+    $map: |
+      `${config.host}/apis/extensions/v1beta1/namespaces/${params.name}/ingresses`
   root: items
   mapper:
     $mapper: |-

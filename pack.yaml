@@ -7,9 +7,17 @@ description: |
   /api[/:env]/kube should point to Kubernetes Master (EG: https://mykube)
 
   Where :env is an optional value to route to different clusters.
+config:
+  env:
+    type: string
+    description: Environment name for the instance of the plugin.
+  host:
+    type: string
+    description: Hostname or host path to the instance of the Kubernetes API.
+    default: /api/kubernetes
 pages:
   KubeDashboard:
-    $ref: pages/kubedashboard.yaml
+    $ref: pages/dashboard.yaml
   Namespaces:
     $ref: pages/namespaces.yaml
   Pod:
@@ -50,5 +58,6 @@ pages:
     $ref: pages/deployment.yaml
   Service:
     $ref: pages/service.yaml
+basePath: config.env?`/kubernetes/${config.env}`:'/kubernetes'
 icon:
   $ref: icon.yaml

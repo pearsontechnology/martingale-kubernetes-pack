@@ -4,7 +4,8 @@ props:
   title:
     $map: '`${params.name} - ${params.id} - ${params.container} Logs`'
   url:
-    $map: (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.name}/pods/${params.id}/log?sinceSeconds=3600&container=${params.container}`
+    $map: |
+      `${config.host}/api/v1/namespaces/${params.name}/pods/${params.id}/log?sinceSeconds=3600&container=${params.container}`
   mapper:
     $mapper: |-
       (()=>{

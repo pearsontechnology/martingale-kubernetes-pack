@@ -3,8 +3,8 @@ props:
   title:
     $map: '`${params.name} - ${params.id} - Details`'
   url:
-    $map: >-
-      (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.name}/pods/${params.id}`
+    $map: |
+      `${config.host}/api/v1/namespaces/${params.name}/pods/${params.id}`
 paths:
   - /kubernetes/namespace/:name/pod/:id
   - /kubernetes/:env/namespace/:name/pod/:id

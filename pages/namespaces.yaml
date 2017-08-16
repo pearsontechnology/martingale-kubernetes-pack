@@ -3,7 +3,7 @@ props:
   title: Kubernetes Namespaces
   url:
     $map: >-
-      (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces`
+      `${config.host}/api/v1/namespaces`
   root: items
   mapper:
     $mapper: |-

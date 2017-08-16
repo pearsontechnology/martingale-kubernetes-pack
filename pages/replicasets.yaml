@@ -3,8 +3,8 @@ props:
   title:
     $map: '`${params.namespace} - Replicasets`'
   url:
-    $map: >-
-      (params.env?`/api/${params.env}/kube`:"/api/kube")+`/apis/extensions/v1beta1/namespaces/${params.namespace}/replicasets`
+    $map: |
+      `${config.host}/apis/extensions/v1beta1/namespaces/${params.namespace}/replicasets`
   root: items
   mapper:
     $mapper: |-

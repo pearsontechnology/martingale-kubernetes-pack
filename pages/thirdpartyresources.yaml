@@ -3,8 +3,8 @@ $type: DataViewPage
 props:
   title: Third Party Resources
   url:
-    $map: >-
-      (params.env?`/api/${params.env}/kube`:"/api/kube")+`/apis/extensions/v1beta1/thirdpartyresources`
+    $map: |
+      `${config.host}/apis/extensions/v1beta1/thirdpartyresources`
   root: items
   mapper:
     $mapper: |-

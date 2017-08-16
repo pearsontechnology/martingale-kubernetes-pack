@@ -3,8 +3,8 @@ props:
   title:
     $map: '`${params.name} - Pod''s`'
   url:
-    $map: >-
-      (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.name}/pods`
+    $map: |
+      `${config.host}/api/v1/namespaces/${params.name}/pods`
   root: items
   mapper:
     $mapper: |-
@@ -39,8 +39,8 @@ props:
           caption: Details
           btnStyle: default
     - delete:
-        $mapper: >-
-          (params.env?`/api/${params.env}/kube`:"/api/kube")+`/api/v1/namespaces/${params.name}/pods/${props.name}`
+        $mapper: |
+          `${config.host}/api/v1/namespaces/${params.name}/pods/${props.name}`
       caption: Delete
       message: 'Are you sure you want to delete ${name}?'
 paths:
