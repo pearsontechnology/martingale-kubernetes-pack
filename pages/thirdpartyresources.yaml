@@ -30,3 +30,4 @@ paths:
   - /kubernetes/thirdpartyresources
   - /kubernetes/:env/thirdpartyresources
 sideNav: true
+icon: Gateway
