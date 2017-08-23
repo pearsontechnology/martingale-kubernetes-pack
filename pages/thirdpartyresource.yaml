@@ -5,6 +5,8 @@ props:
   url:
     $map: |
       `${config.host}/apis/${params.name.replace(/[^\.]+\./, '')}/v1/${plural(params.name.replace(/\..+/, ''))}`
+  headers:
+    $map: config.headers
 paths:
   - /kubernetes/thirdpartyresource/:name
   - /kubernetes/:env/thirdpartyresource/:name

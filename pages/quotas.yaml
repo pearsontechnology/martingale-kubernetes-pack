@@ -5,6 +5,8 @@ props:
   url:
     $map: |
       `${config.host}/api/v1/namespaces/${params.namespace}/resourcequotas`
+  headers:
+    $map: config.headers
   root: items
   mapper:
     $mapper: |-

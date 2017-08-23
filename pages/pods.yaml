@@ -5,6 +5,8 @@ props:
   url:
     $map: |
       `${config.host}/api/v1/namespaces/${params.name}/pods`
+  headers:
+    $map: config.headers
   root: items
   mapper:
     $mapper: |-

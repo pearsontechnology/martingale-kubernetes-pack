@@ -5,6 +5,8 @@ props:
   url:
     $map: |
       `${config.host}/apis/extensions/v1beta1/namespaces/${params.namespace}/daemonsets/${params.name}`
+  headers:
+    $map: config.headers
 paths:
   - /kubernetes/namespace/:namespace/daemonset/:name
   - /kubernetes/:env/namespace/:namespace/daemonset/:name

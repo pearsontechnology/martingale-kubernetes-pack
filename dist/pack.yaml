@@ -19,6 +19,9 @@ config:
     type: string
     description: Hostname or host path to the instance of the Kubernetes API.
     default: /api/kubernetes
+  headers:
+    type: object
+    description: Any custom headers such as authorization that need to be sent through.
 pages:
   KubeDashboard:
     $type: HeaderPage
@@ -36,6 +39,8 @@ pages:
               data:
                 url:
                   $map: '`${config.host}/api/v1/componentstatuses`'
+                headers:
+                  $map: config.headers
                 root: items
                 mapper:
                   $mapper: |-
@@ -63,6 +68,8 @@ pages:
               data:
                 url:
                   $map: '`${config.host}/api/v1/events`'
+                headers:
+                  $map: config.headers
                 root: items
                 mapper:
                   $mapper: |-
@@ -94,6 +101,8 @@ pages:
               data:
                 url:
                   $map: '`${config.host}/api/v1/nodes`'
+                headers:
+                  $map: config.headers
                 root: items
                 mapper:
                   $mapper: |-
@@ -134,6 +143,8 @@ pages:
       title: Kubernetes Namespaces
       url:
         $map: '`${config.host}/api/v1/namespaces`'
+      headers:
+        $map: config.headers
       root: items
       mapper:
         $mapper: |-
@@ -189,6 +200,8 @@ pages:
       url:
         $map: |
           `${config.host}/api/v1/namespaces/${params.name}/pods/${params.id}`
+      headers:
+        $map: config.headers
     paths:
       - '/kubernetes/namespace/:name/pod/:id'
       - '/kubernetes/:env/namespace/:name/pod/:id'
@@ -201,6 +214,8 @@ pages:
       url:
         $map: >
           `${config.host}/api/v1/namespaces/${params.name}/pods/${params.id}/log?sinceSeconds=3600&container=${params.container}`
+      headers:
+        $map: config.headers
       mapper:
         $mapper: |-
           (()=>{
@@ -239,6 +254,8 @@ pages:
       url:
         $map: >
           `${config.host}/apis/extensions/v1beta1/namespaces/${params.name}/ingresses`
+      headers:
+        $map: config.headers
       root: items
       mapper:
         $mapper: |-
@@ -271,6 +288,8 @@ pages:
       url:
         $map: |
           `${config.host}/api/v1/namespaces/${params.name}/pods`
+      headers:
+        $map: config.headers
       root: items
       mapper:
         $mapper: |-
@@ -320,6 +339,8 @@ pages:
       url:
         $map: |
           `${config.host}/api/v1/namespaces/${params.namespace}/secrets`
+      headers:
+        $map: config.headers
       root: items
       mapper:
         $mapper: |-
@@ -350,6 +371,8 @@ pages:
       url:
         $map: >
           `${config.host}/api/v1/namespaces/${params.namespace}/secrets/${params.name}`
+      headers:
+        $map: config.headers
     paths:
       - '/kubernetes/namespace/:namespace/secret/:name'
       - '/kubernetes/:env/namespace/:namespace/secret/:name'
@@ -361,6 +384,8 @@ pages:
       url:
         $map: |
           `${config.host}/apis/extensions/v1beta1/thirdpartyresources`
+      headers:
+        $map: config.headers
       root: items
       mapper:
         $mapper: |-
@@ -396,6 +421,8 @@ pages:
       url:
         $map: >
           `${config.host}/apis/extensions/v1beta1/namespaces/${params.namespace}/ingresses/${params.name}`
+      headers:
+        $map: config.headers
     paths:
       - '/kubernetes/namespace/:namespace/ingress/:name'
       - '/kubernetes/:env/namespace/:namespace/ingress/:name'
@@ -408,6 +435,8 @@ pages:
         $map: >
           `${config.host}/apis/${params.name.replace(/[^\.]+\./,
           '')}/v1/${plural(params.name.replace(/\..+/, ''))}`
+      headers:
+        $map: config.headers
     paths:
       - '/kubernetes/thirdpartyresource/:name'
       - '/kubernetes/:env/thirdpartyresource/:name'
@@ -419,6 +448,8 @@ pages:
       url:
         $map: >
           `${config.host}/apis/extensions/v1beta1/namespaces/${params.namespace}/daemonsets/${params.name}`
+      headers:
+        $map: config.headers
     paths:
       - '/kubernetes/namespace/:namespace/daemonset/:name'
       - '/kubernetes/:env/namespace/:namespace/daemonset/:name'
@@ -430,6 +461,8 @@ pages:
       url:
         $map: >
           `${config.host}/apis/extensions/v1beta1/namespaces/${params.namespace}/replicasets`
+      headers:
+        $map: config.headers
       root: items
       mapper:
         $mapper: |-
@@ -462,6 +495,8 @@ pages:
       url:
         $map: >
           `${config.host}/apis/extensions/v1beta1/namespaces/${params.namespace}/replicasets/${params.name}`
+      headers:
+        $map: config.headers
     paths:
       - '/kubernetes/namespace/:namespace/replicaset/:name'
       - '/kubernetes/:env/namespace/:namespace/replicaset/:name'
@@ -473,6 +508,8 @@ pages:
       url:
         $map: >
           `${config.host}/apis/extensions/v1beta1/namespaces/${params.namespace}/daemonsets`
+      headers:
+        $map: config.headers
       root: items
       mapper:
         $mapper: |-
@@ -503,6 +540,8 @@ pages:
       url:
         $map: |
           `${config.host}/api/v1/namespaces/${params.namespace}/resourcequotas`
+      headers:
+        $map: config.headers
       root: items
       mapper:
         $mapper: |-
@@ -553,6 +592,8 @@ pages:
       url:
         $map: >
           `${config.host}/api/v1/namespaces/${params.namespace}/resourcequotas/${params.name}`
+      headers:
+        $map: config.headers
     paths:
       - '/kubernetes/namespace/:namespace/resourcequotas/:name'
       - '/kubernetes/:env/namespace/:namespace/resourcequotas/:name'
@@ -564,6 +605,8 @@ pages:
       url:
         $map: >
           `${config.host}/apis/extensions/v1beta1/namespaces/${params.namespace}/deployments`
+      headers:
+        $map: config.headers
       root: items
       mapper:
         $mapper: |-
@@ -601,6 +644,8 @@ pages:
       url:
         $map: |
           `${config.host}/api/v1/namespaces/${params.namespace}/services`
+      headers:
+        $map: config.headers
       root: items
       mapper:
         $mapper: |-
@@ -631,6 +676,8 @@ pages:
       url:
         $map: >
           `${config.host}/apis/extensions/v1beta1/namespaces/${params.namespace}/deployments/${params.name}`
+      headers:
+        $map: config.headers
     paths:
       - '/kubernetes/namespace/:namespace/deployment/:name'
       - '/kubernetes/:env/namespace/:namespace/deployment/:name'
@@ -642,6 +689,8 @@ pages:
       url:
         $map: >
           `${config.host}/api/v1/namespaces/${params.namespace}/services/${params.name}`
+      headers:
+        $map: config.headers
     paths:
       - '/kubernetes/namespace/:namespace/service/:name'
       - '/kubernetes/:env/namespace/:namespace/service/:name'

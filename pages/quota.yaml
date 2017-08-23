@@ -5,6 +5,8 @@ props:
   url:
     $map: |
       `${config.host}/api/v1/namespaces/${params.namespace}/resourcequotas/${params.name}`
+  headers:
+    $map: config.headers
 paths:
   - /kubernetes/namespace/:namespace/resourcequotas/:name
   - /kubernetes/:env/namespace/:namespace/resourcequotas/:name

@@ -19,6 +19,9 @@ Where :env is an optional value to route to different clusters.
 ### host: Hostname or host path to the instance of the Kubernetes API.
 **Default Value:** /api/kubernetes
 
+### headers: Any custom headers such as authorization that need to be sent through.
+
+
 ## Included Pages
 ### KubeDashboard: Side Nav
 
