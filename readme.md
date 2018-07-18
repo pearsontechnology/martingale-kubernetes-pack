@@ -1,4 +1,4 @@
-# Martinglae Kubernetes Pack
+# Martingale Kubernetes Pack
 
 **Name:** Kubernetes
 
