@@ -6,10 +6,10 @@
     "git@github.com:pearsontechnology/martingale-kubernetes-pack.git",
   "author": "Jeremy Darling <jeremy.darling@pearson.com>",
   "scripts": {
-    "build": "mpack build",
-    "test": "mpack test -p 8081",
-    "doc": "mpack doc",
-    "docker": "mpack docker -p 8081"
+    "build": "npx @martingale/packs build",
+    "test": "npx @martingale/packs test -p 8081",
+    "doc": "npx @martingale/packs doc",
+    "docker": "npx @martingale/packs docker -p 8081"
   },
   "dependencies": {
     "martingale-pack-builder": "^0.0.1"
