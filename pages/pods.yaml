@@ -29,7 +29,7 @@ props:
                       };
                     });
                   }).reduce((a,b)=>a.concat(b),[])
-  refresh: 5000
+  #refresh: 5000
   suppress:
     - baseLink
   actions:

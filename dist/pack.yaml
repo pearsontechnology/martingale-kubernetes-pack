@@ -312,7 +312,6 @@ pages:
                           };
                         });
                       }).reduce((a,b)=>a.concat(b),[])
-      refresh: 5000
       suppress:
         - baseLink
       actions:
