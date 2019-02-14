@@ -33,6 +33,8 @@ props:
           `${config.host}/apis/extensions/v1beta1/namespaces/${params.namespace}/deployments/${props.name}`
       caption: Delete
       message: 'Are you sure you want to delete ${name}?'
+      headers:
+        $map: config.headers
 paths:
   - /kubernetes/namespace/:namespace/deployments
   - /kubernetes/:env/namespace/:namespace/deployments

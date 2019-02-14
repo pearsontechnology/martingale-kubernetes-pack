@@ -29,7 +29,7 @@ props:
                       };
                     });
                   }).reduce((a,b)=>a.concat(b),[])
-  refresh: 5000
+  #refresh: 5000
   suppress:
     - baseLink
   actions:
@@ -45,6 +45,8 @@ props:
           `${config.host}/api/v1/namespaces/${params.name}/pods/${props.name}`
       caption: Delete
       message: 'Are you sure you want to delete ${name}?'
+      headers:
+        $map: config.headers
 paths:
   - /kubernetes/namespace/:name/pods
   - /kubernetes/:env/namespace/:name/pods
